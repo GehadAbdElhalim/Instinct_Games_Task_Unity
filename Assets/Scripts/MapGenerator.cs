@@ -15,18 +15,17 @@ public class MapGenerator : MonoBehaviour
 
     void GenerateMap(int mapHeight, int mapWidth, float cellHeight, float cellWidth)
     {
-        for (float i = 0; i < mapHeight; i++)
+        for (int i = 0; i < mapHeight; i++)
         {
-            for (float j = 0; j < mapWidth; j++)
+            for (int j = 0; j < mapWidth; j++)
             {
                 float x = -((mapHeight - 1) / 2.0f) + i;
                 x *= cellHeight;
                 float z = -((mapWidth - 1) / 2.0f) + j;
                 z *= cellWidth;
 
-                GameObject go = Instantiate(cell, new Vector3(x, 0, z), Quaternion.identity);
+                GameObject go = Instantiate(cell, new Vector3(x, transform.position.y, z), Quaternion.identity, transform);
                 go.transform.localScale = new Vector3(cellHeight, 1, cellWidth);
-                go.transform.SetParent(transform);
             }
         }
 
