@@ -202,7 +202,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   xSize: 2
-  ySize: 3
+  ySize: 1
   cellScale: 1
 --- !u!23 &135983463
 MeshRenderer:
