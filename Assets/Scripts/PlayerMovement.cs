@@ -16,10 +16,10 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         Vector3 forward = Vector3.ProjectOnPlane(cam.forward, Vector3.up).normalized;
-        rb.AddForce(forward * Input.GetAxis("Vertical") * moveSpeed * Time.fixedDeltaTime, ForceMode.VelocityChange);
+        rb.AddForce(forward * Input.GetAxis("Vertical") * moveSpeed * Time.fixedDeltaTime, ForceMode.Force);
 
         Vector3 right = Vector3.ProjectOnPlane(cam.right, Vector3.up).normalized;
-        rb.AddForce(right * Input.GetAxis("Horizontal") * moveSpeed * Time.fixedDeltaTime, ForceMode.VelocityChange);
+        rb.AddForce(right * Input.GetAxis("Horizontal") * moveSpeed * Time.fixedDeltaTime, ForceMode.Force);
     }
 
 
