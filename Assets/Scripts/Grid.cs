@@ -68,6 +68,12 @@ public class Grid : MonoBehaviour
                 triangles[ti + 5] = vi + xSize + 2;
             }
         }
+
+        foreach(int t in triangles)
+        {
+            print(t);
+        }
+
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
     }
