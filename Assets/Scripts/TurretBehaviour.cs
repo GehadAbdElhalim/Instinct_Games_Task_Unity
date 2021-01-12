@@ -10,9 +10,11 @@ public class TurretBehaviour : MonoBehaviour
 
     LineRenderer lr;
 
-    bool playerSeen = false;
+    public bool playerSeen = false;
 
     bool rotatingRight = true;
+
+    float shootingDelay;
 
     private void Start()
     {
@@ -59,7 +61,7 @@ public class TurretBehaviour : MonoBehaviour
 
     bool IsPlayerOutOfRange()
     {
-        return false;
+        return Vector3.Distance(GameManager.instance.player.transform.position, new Vector3(transform.position.x, GameManager.instance.player.transform.position.y, transform.position.z)) > focusRadius;
     }
 
     Vector3 PredictNextPlayerPosiion()
@@ -100,6 +102,16 @@ public class TurretBehaviour : MonoBehaviour
 
     bool FoundAPlayer()
     {
+        RaycastHit hit;
+
+        if (Physics.Raycast(raycastStartPos.position, raycastStartPos.forward, out hit))
+        {
+            if(hit.collider.tag == "Player")
+            {
+                return true;
+            }
+        }
+
         return false;
     }
 
