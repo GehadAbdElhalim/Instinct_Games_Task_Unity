@@ -235,7 +235,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &104050126
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -249,8 +249,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cellSize: {x: 1, y: 1}
-  mapSize: {x: 10, y: 10}
+  mapSize: {x: 15, y: 15}
   cell: {fileID: 3188497207569203226, guid: 49c13516bfe6f6e47b002b94fcffde67, type: 3}
+  turret: {fileID: 0}
 --- !u!4 &104050127
 Transform:
   m_ObjectHideFlags: 0
@@ -453,7 +454,7 @@ Transform:
   m_GameObject: {fileID: 688694344}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 11.846639, y: 11.846639, z: 11.846639}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
@@ -1017,11 +1018,6 @@ PrefabInstance:
     - target: {fileID: 4359974865543550523, guid: 452be5ed09005054abec90be08c666be,
         type: 3}
       propertyPath: m_Name
-      value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 4359974865543550523, guid: 452be5ed09005054abec90be08c666be,
-        type: 3}
-      propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 4359974865543550526, guid: 452be5ed09005054abec90be08c666be,
