@@ -677,12 +677,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 213f8b4731b8f7a48b7ddb44987f97bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bulletSpeed: 0.1
   rotationSpeed: 10
   angleOfView: 40
   focusRadius: 5
   rotatingHeadTransform: {fileID: 1895658033}
-  raycastStartPos: {fileID: 1171129743}
+  raycastStartPoint: {fileID: 1171129743}
+  bulletSpwanPoint: {fileID: 1171129743}
   playerSeen: 0
+  shotDelay: 1
 --- !u!54 &736651331
 Rigidbody:
   m_ObjectHideFlags: 0
