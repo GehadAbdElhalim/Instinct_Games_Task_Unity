@@ -235,7 +235,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &104050126
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -265,6 +265,36 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &114730126
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 114730127}
+  m_Layer: 0
+  m_Name: BulletSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &114730127
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114730126}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.73}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1171129743}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &135983461
 GameObject:
@@ -454,7 +484,7 @@ Transform:
   m_GameObject: {fileID: 688694344}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
@@ -678,14 +708,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 213f8b4731b8f7a48b7ddb44987f97bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletSpeed: 0.1
+  state: 0
   rotationSpeed: 10
   angleOfView: 40
   focusRadius: 5
   rotatingHeadTransform: {fileID: 1895658033}
   raycastStartPoint: {fileID: 1171129743}
-  bulletSpwanPoint: {fileID: 1171129743}
+  bullet: {fileID: 7954006542916213209, guid: 624fdbecffcc5054a82ac41802fe3d9c, type: 3}
+  bulletSpwanPoint: {fileID: 114730127}
   playerSeen: 0
+  rotatingToShoot: 0
   shotDelay: 1
 --- !u!54 &736651331
 Rigidbody:
@@ -850,7 +882,8 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 114730127}
   m_Father: {fileID: 1895658033}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
