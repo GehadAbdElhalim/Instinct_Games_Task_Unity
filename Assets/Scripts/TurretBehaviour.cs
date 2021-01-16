@@ -5,6 +5,7 @@ using UnityEngine;
 public class TurretBehaviour : MonoBehaviour
 {
     public TurretState state;
+    public LayerMask raycastLayers;
 
     public float rotationSpeed;
     public float angleOfView;
@@ -150,8 +151,9 @@ public class TurretBehaviour : MonoBehaviour
 
         while (angleRotated < theta)
         {
-            print(angleRotated);
-            rotatingHeadTransform.forward = Vector3.Lerp(rotatingHeadTransform.forward, targetVector, w * Time.fixedDeltaTime);
+            //rotatingHeadTransform.Rotate(rotatingHeadTransform.transform.up, w);
+            rotatingHeadTransform.forward = Vector3.MoveTowards(rotatingHeadTransform.forward, targetVector, 0.1f);
+            //rotatingHeadTransform.forward = Vector3.Lerp(rotatingHeadTransform.forward, targetVector, w * Time.fixedDeltaTime);
             angleRotated += w * Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
         }
@@ -196,7 +198,7 @@ public class TurretBehaviour : MonoBehaviour
     {
         RaycastHit hit;
 
-        if (Physics.Raycast(raycastStartPoint.position, raycastStartPoint.forward, out hit))
+        if (Physics.Raycast(raycastStartPoint.position, raycastStartPoint.forward, out hit, 1000f, raycastLayers))
         {
             if (hit.collider.tag == "Player")
             {
@@ -213,7 +215,7 @@ public class TurretBehaviour : MonoBehaviour
 
         Vector3[] vertices = new Vector3[2];
 
-        if (Physics.Raycast(raycastStartPoint.position, raycastStartPoint.forward, out hit))
+        if (Physics.Raycast(raycastStartPoint.position, raycastStartPoint.forward, out hit, 1000f, raycastLayers))
         {
             vertices[0] = raycastStartPoint.position;
             vertices[1] = hit.point;

@@ -3,7 +3,7 @@ using UnityEngine.Events;
 
 public class HealthBehaviour : MonoBehaviour
 {
-    public static UnityEvent OnPlayerDead;
+    public static UnityEvent OnPlayerDead = new UnityEvent();
     public float maxHealth;
     float currentHealth;
 
