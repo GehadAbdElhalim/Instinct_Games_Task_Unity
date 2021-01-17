@@ -45,7 +45,7 @@ public class collectibleBehaviour : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         if (other.tag == "Player")
         {
@@ -56,16 +56,18 @@ public class collectibleBehaviour : MonoBehaviour
             }
             else
             {
+                followPlayer = false;
                 GameManager.instance.score += 1;
                 OnCollectibleDestroyed.Invoke();
-                Destroy(gameObject);
+                ObjectPooler.instance.ReturnToPool("Collectible", this.gameObject);
             }
         }
 
         if(other.tag == "Turret")
         {
+            followPlayer = false;
             OnCollectibleDestroyed.Invoke();
-            Destroy(gameObject);
+            ObjectPooler.instance.ReturnToPool("Collectible", this.gameObject);
         }
     }
 }

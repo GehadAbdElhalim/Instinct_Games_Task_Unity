@@ -57,13 +57,22 @@ public class TurretBehaviour : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (playerSeen)
+        if(state == TurretState.Idle)
         {
-            playerSeen = !IsPlayerOutOfRange();
+            ReturnToRange();
+            UpdateRotation();
+
+            if (FoundAPlayer())
+            {
+                state = TurretState.PlayerInRange;
+            }
+            playerSeen = FoundAPlayer();
         }
 
-        if (playerSeen)
+        if(state == TurretState.PlayerInRange)
         {
+            LockLaserOnPlayer();
+
             if (!rotatingToShoot)
             {
                 rotatingToShoot = true;
@@ -71,33 +80,61 @@ public class TurretBehaviour : MonoBehaviour
                 predictedPos = pos;
                 StartCoroutine(RotateAtPosition(pos));
             }
-        }
-        else
-        {
-            if (!rotatingToShoot)
+
+            if (IsPlayerOutOfRange())
             {
-                ReturnToRange();
-                UpdateRotation();
-                playerSeen = FoundAPlayer();
+                state = TurretState.Idle;
             }
         }
+
+
+        //if (playerSeen)
+        //{
+        //    playerSeen = !IsPlayerOutOfRange();
+        //}
+
+        //if (playerSeen)
+        //{
+        //    if (!rotatingToShoot)
+        //    {
+        //        rotatingToShoot = true;
+        //        Vector3 pos = PredictNextPlayerPosiion();
+        //        predictedPos = pos;
+        //        StartCoroutine(RotateAtPosition(pos));
+        //    }
+        //}
+        //else
+        //{
+        //    if (!rotatingToShoot)
+        //    {
+        //        ReturnToRange();
+        //        UpdateRotation();
+        //        playerSeen = FoundAPlayer();
+        //    }
+        //}
+    }
+
+    private void LockLaserOnPlayer()
+    {
+        raycastStartPoint.LookAt(GameManager.instance.player.transform.position);
     }
 
     private void ReturnToRange()
     {
-        if(rotatingHeadTransform.transform.localEulerAngles.x == xAngle)
+        if (rotatingHeadTransform.transform.localEulerAngles.x == xAngle)
         {
             return;
         }
 
         float currentXAngle = Mathf.Lerp(rotatingHeadTransform.localEulerAngles.x, xAngle, Time.fixedDeltaTime * 5);
 
-        if(Mathf.Abs(currentXAngle - xAngle) < 0.5f)
+        if (Mathf.Abs(currentXAngle - xAngle) < 0.5f)
         {
             currentXAngle = xAngle;
         }
 
         rotatingHeadTransform.transform.localEulerAngles = new Vector3(currentXAngle, rotatingHeadTransform.transform.localEulerAngles.y, rotatingHeadTransform.transform.localEulerAngles.z);
+        raycastStartPoint.forward = rotatingHeadTransform.forward;
     }
 
     private void LateUpdate()
@@ -121,23 +158,80 @@ public class TurretBehaviour : MonoBehaviour
         Vector3 movementDir = player.GetComponent<Rigidbody>().velocity.normalized;
 
         return player.transform.position + movementDir * d1;
+
+        //return FirstOrderIntercept(bulletSpwanPoint.transform.position, Vector3.zero, bullet.GetComponent<BulletBehaviour>().speed, player.transform.position, player.GetComponent<Rigidbody>().velocity);
+    }
+
+    //first-order intercept using absolute target position
+    public Vector3 FirstOrderIntercept(Vector3 shooterPosition, Vector3 shooterVelocity, float shotSpeed, Vector3 targetPosition, Vector3 targetVelocity)
+    {
+        Vector3 targetRelativePosition = targetPosition - shooterPosition;
+        Vector3 targetRelativeVelocity = targetVelocity - shooterVelocity;
+        float t = FirstOrderInterceptTime(shotSpeed, targetRelativePosition, targetRelativeVelocity);
+        return targetPosition + t * (targetRelativeVelocity);
+    }
+    //first-order intercept using relative target position
+    public float FirstOrderInterceptTime(float shotSpeed, Vector3 targetRelativePosition, Vector3 targetRelativeVelocity)
+    {
+        float velocitySquared = targetRelativeVelocity.sqrMagnitude;
+        if (velocitySquared < 0.001f)
+            return 0f;
+
+        float a = velocitySquared - shotSpeed * shotSpeed;
+
+        //handle similar velocities
+        if (Mathf.Abs(a) < 0.001f)
+        {
+            float t = -targetRelativePosition.sqrMagnitude /
+            (
+                2f * Vector3.Dot
+                (
+                    targetRelativeVelocity,
+                    targetRelativePosition
+                )
+            );
+            return Mathf.Max(t, 0f); //don't shoot back in time
+        }
+
+        float b = 2f * Vector3.Dot(targetRelativeVelocity, targetRelativePosition);
+        float c = targetRelativePosition.sqrMagnitude;
+        float determinant = b * b - 4f * a * c;
+
+        if (determinant > 0f)
+        { //determinant > 0; two intercept paths (most common)
+            float t1 = (-b + Mathf.Sqrt(determinant)) / (2f * a),
+                    t2 = (-b - Mathf.Sqrt(determinant)) / (2f * a);
+            if (t1 > 0f)
+            {
+                if (t2 > 0f)
+                    return Mathf.Min(t1, t2); //both are positive
+                else
+                    return t1; //only t1 is positive
+            }
+            else
+                return Mathf.Max(t2, 0f); //don't shoot back in time
+        }
+        else if (determinant < 0f) //determinant < 0; no intercept path
+            return 0f;
+        else //determinant = 0; one intercept path, pretty much never happens
+            return Mathf.Max(-b / (2f * a), 0f); //don't shoot back in time
     }
 
     IEnumerator RotateAtPosition(Vector3 targetPos)
     {
         GameObject player = GameManager.instance.player;
 
-        d2 = Vector3.Distance(targetPos, rotatingHeadTransform.position);
-        d3 = Vector3.Distance(player.transform.position, rotatingHeadTransform.position);
+        d2 = Vector3.Distance(targetPos, bulletSpwanPoint.position);
+        d3 = Vector3.Distance(player.transform.position, bulletSpwanPoint.position);
 
         theta = Mathf.Acos((d2 * d2 + d3 * d3 - d1 * d1) / (2 * d2 * d3));
 
         v2 = bullet.GetComponent<BulletBehaviour>().speed * Time.fixedDeltaTime;
-        v2 = 0.1f;
+        //v2 = 0.1f;
 
         float distanceBetweenBulletAndTargetPos = d2 - Vector3.Distance(rotatingHeadTransform.position, bulletSpwanPoint.position);
 
-        t3 = v2 / distanceBetweenBulletAndTargetPos;
+        t3 = distanceBetweenBulletAndTargetPos / v2;
 
         t2 = t1 - t3;
 
@@ -152,20 +246,26 @@ public class TurretBehaviour : MonoBehaviour
         while (angleRotated < theta)
         {
             //rotatingHeadTransform.Rotate(rotatingHeadTransform.transform.up, w);
-            rotatingHeadTransform.forward = Vector3.MoveTowards(rotatingHeadTransform.forward, targetVector, 0.1f);
-            //rotatingHeadTransform.forward = Vector3.Lerp(rotatingHeadTransform.forward, targetVector, w * Time.fixedDeltaTime);
+            //rotatingHeadTransform.forward = Vector3.MoveTowards(rotatingHeadTransform.forward, targetVector, 0.1f);
+            rotatingHeadTransform.forward = Vector3.Lerp(rotatingHeadTransform.forward, targetVector, w * Time.fixedDeltaTime);
             angleRotated += w * Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
         }
 
-        rotatingToShoot = false;
+        Invoke("FalsifyRotatingToShoot", 1f);
 
         ShootProjectile();
     }
 
+    void FalsifyRotatingToShoot()
+    {
+        rotatingToShoot = false;
+    }
+
     void ShootProjectile()
     {
-        Instantiate(bullet, bulletSpwanPoint.position, bulletSpwanPoint.rotation);    
+        //Instantiate(bullet, bulletSpwanPoint.position, bulletSpwanPoint.rotation);
+        ObjectPooler.instance.SpawnFromPool("Bullet", bulletSpwanPoint.position, bulletSpwanPoint.rotation);
     }
 
     void UpdateRotation()
@@ -246,5 +346,6 @@ public class TurretBehaviour : MonoBehaviour
 public enum TurretState
 {
     Idle,
+    PlayerInRange,
     RotatingToShoot,
 }

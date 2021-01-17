@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Turret
+  - Bullet
+  - Collectible
+  - Cell
+  - Border
   layers:
   - Default
   - TransparentFX
@@ -16,7 +20,7 @@ TagManager:
   - 
   - Collectibles
   - Bullets
-  - 
+  - Turret
   - 
   - 
   - 

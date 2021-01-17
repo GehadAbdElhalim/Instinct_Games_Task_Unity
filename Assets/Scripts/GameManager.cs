@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
     public MapGenerator mapGenerator;
+
+    public UIManager uiManager;
 
     public GameObject player;
 
@@ -23,9 +26,16 @@ public class GameManager : MonoBehaviour
 
     public int score;
 
+    bool gameEnded = false;
+
     private void Awake()
     {
         instance = this;
+    }
+
+    private void Start()
+    {
+        HealthBehaviour.OnPlayerDead.AddListener(EndGame);
 
         string filePath = Application.dataPath + "/StreamingAssets/" + fileName;
 
@@ -54,7 +64,7 @@ public class GameManager : MonoBehaviour
                     lineParts[1] = lineParts[1].Replace(" ", "");
                     string[] cells = lineParts[1].Split(',');
 
-                    for(int i = 0; i < cells.Length; i++)
+                    for (int i = 0; i < cells.Length; i++)
                     {
                         cells[i] = cells[i].Trim('(', ')');
                         //cells[i] = cells[i].Replace(" ", "");
@@ -78,5 +88,29 @@ public class GameManager : MonoBehaviour
         }
 
         mapGenerator.SpawnCollectibles();
+    }
+
+    private void Update()
+    {
+        if (gameEnded)
+        {
+            if(Input.GetKeyUp(KeyCode.Return) || Input.GetKeyUp(KeyCode.KeypadEnter))
+            {
+                RestartGame();
+            }
+        }
+    }
+
+    public void EndGame()
+    {
+        uiManager.ShowEndScreen();
+        gameEnded = true;
+        Time.timeScale = 0;
+    }
+
+    void RestartGame()
+    {
+        Time.timeScale = 1;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

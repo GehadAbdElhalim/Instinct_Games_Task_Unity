@@ -10,7 +10,10 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] GameObject collectible;
     [SerializeField] GameObject border;
 
-    public Vector3[,] cellPositions;
+    [HideInInspector] public Vector3[,] cellPositions;
+
+    [Header("Materials")]
+    [SerializeField] Material[] cellMats;
 
     private void Awake()
     {
@@ -26,8 +29,12 @@ public class MapGenerator : MonoBehaviour
 
         cellPositions = new Vector3[mapHeight, mapWidth];
 
+        int matIndex = 0;
+
         for (int i = 0; i < mapHeight; i++)
         {
+            matIndex = (matIndex + 1) % cellMats.Length;
+
             for (int j = 0; j < mapWidth; j++)
             {
                 float x = -((mapHeight - 1) / 2.0f) + i;
@@ -37,6 +44,9 @@ public class MapGenerator : MonoBehaviour
 
                 GameObject go = Instantiate(cell, new Vector3(x, transform.position.y, z), Quaternion.identity, transform);
                 go.transform.localScale = new Vector3(cellHeight, 1, cellWidth);
+
+                go.GetComponentInChildren<MeshRenderer>().material = cellMats[matIndex];
+                matIndex = (matIndex + 1) % cellMats.Length;
 
                 cellPositions[i, j] = new Vector3(x, transform.position.y, z);
             }
@@ -102,7 +112,7 @@ public class MapGenerator : MonoBehaviour
     [ContextMenu("spawn collectibles")]
     public void SpawnCollectibles()
     {
-        for(int i = 0; i < 2 * Mathf.Max(mapSize.x,mapSize.y); i++)
+        for (int i = 0; i < 2 * Mathf.Max(mapSize.x, mapSize.y); i++)
         {
             SpawnOneCollectible();
         }
@@ -116,6 +126,7 @@ public class MapGenerator : MonoBehaviour
         float x = Mathf.Sin(angle) * (cellSize.x / 2 - 1) + randomCellCenter.x;
         float z = Mathf.Cos(angle) * (cellSize.y / 2 - 1) + randomCellCenter.z;
 
-        Instantiate(collectible, new Vector3(x, 0.5f, z), Quaternion.identity);
+        //Instantiate(collectible, new Vector3(x, 0.5f, z), Quaternion.identity);
+        ObjectPooler.instance.SpawnFromPool("Collectible", new Vector3(x, 0.25f, z), Quaternion.Euler(180,0,0));
     }
 }

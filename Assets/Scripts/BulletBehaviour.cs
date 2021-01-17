@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BulletBehaviour : MonoBehaviour
 {
@@ -8,6 +6,13 @@ public class BulletBehaviour : MonoBehaviour
 
     public float speed = 300;
     [SerializeField] float bulletDamage = 10;
+    [SerializeField] float maxLifeTime = 10;
+    float currentLifeTime;
+
+    private void OnEnable()
+    {
+        currentLifeTime = maxLifeTime;
+    }
 
     private void Start()
     {
@@ -16,14 +21,26 @@ public class BulletBehaviour : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.velocity = transform.forward * speed * Time.deltaTime;
+        rb.velocity = transform.forward * speed * Time.fixedDeltaTime;
+
+        currentLifeTime -= Time.fixedDeltaTime;
+        if (currentLifeTime <= 0)
+        {
+            ObjectPooler.instance.ReturnToPool("Bullet", gameObject);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
             other.GetComponent<HealthBehaviour>().Damage(bulletDamage);
+            ObjectPooler.instance.ReturnToPool("Bullet", gameObject);
+        }
+
+        if (other.CompareTag("Cell"))
+        {
+            ObjectPooler.instance.ReturnToPool("Bullet", gameObject);
         }
     }
 }

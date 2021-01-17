@@ -10,18 +10,26 @@ public class HealthBehaviour : MonoBehaviour
     private void Start()
     {
         currentHealth = maxHealth;
+        GetComponent<MeshRenderer>().material.color = new Color(1, currentHealth / maxHealth, currentHealth / maxHealth);
+    }
+
+    [ContextMenu("Damage")]
+    void Damage10()
+    {
+        Damage(10);
     }
 
     public void Damage(float amount)
     {
-        if(currentHealth <= 0)
+        if (currentHealth <= 0)
         {
             return;
         }
 
-        currentHealth -= maxHealth;
+        currentHealth -= amount;
+        GetComponent<MeshRenderer>().material.color = new Color(1, currentHealth / maxHealth, currentHealth / maxHealth);
 
-        if(currentHealth <= 0)
+        if (currentHealth <= 0)
         {
             currentHealth = 0;
             OnPlayerDead.Invoke();
