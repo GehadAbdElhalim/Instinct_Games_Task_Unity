@@ -156,7 +156,7 @@ MonoBehaviour:
   cellSize: {x: 5, y: 5}
   bordersHeight: 10
   cell: {fileID: 3188497207569203226, guid: 49c13516bfe6f6e47b002b94fcffde67, type: 3}
-  turret: {fileID: 0}
+  turret: {fileID: 2650004419777966218, guid: 57feac4af37259443ad1bf8d2fb9f873, type: 3}
   collectible: {fileID: 8580703317816240456, guid: 0e5c4c62845d62a4bbe659d916e427fe,
     type: 3}
   border: {fileID: 1440424270766186564, guid: 5d0c103de348a3d4194920ad9b92ad30, type: 3}
