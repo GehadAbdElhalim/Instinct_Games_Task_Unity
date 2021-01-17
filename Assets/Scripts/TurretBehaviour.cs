@@ -4,35 +4,35 @@ using UnityEngine;
 
 public class TurretBehaviour : MonoBehaviour
 {
-    public TurretState state;
-    public LayerMask raycastLayers;
-
-    public float rotationSpeed;
-    public float angleOfView;
+    public float rotationSpeed_Idle;
+    public float maxYAngle_Idle;
     public float focusRadius;
+
     [SerializeField] Transform rotatingHeadTransform;
     [SerializeField] Transform raycastStartPoint;
-    [SerializeField] GameObject bullet;
     [SerializeField] Transform bulletSpwanPoint;
+    [SerializeField] GameObject bullet;
 
+    public LayerMask raycastLayers;
+
+    //Components
     LineRenderer lr;
 
-    public bool playerSeen = false;
-
+    //private variables
+    TurretState state;
+    float startingXAngle;
+    bool rotatingToShoot = false;
     bool rotatingRight = true;
 
-    public bool rotatingToShoot = false;
-
-    public float shotDelay;
-
+    //Variables for predicting the player location and shooting towards it
+    float shotDelay = 1;
     float d1, d2, d3;
     float t1, t2, t3;
     float v1, v2, w;
     float theta;
 
+    //Variables for Gizmos
     Vector3 predictedPos;
-
-    float xAngle;
 
     private void Start()
     {
@@ -50,14 +50,14 @@ public class TurretBehaviour : MonoBehaviour
 
         rotatingHeadTransform.LookAt(endPoint);
 
-        xAngle = rotatingHeadTransform.localEulerAngles.x;
+        startingXAngle = rotatingHeadTransform.localEulerAngles.x;
 
         //rotatingHeadTransform.localEulerAngles = new Vector3(xAngle, 0, 0);
     }
 
     private void FixedUpdate()
     {
-        if(state == TurretState.Idle)
+        if (state == TurretState.Idle)
         {
             ReturnToRange();
             UpdateRotation();
@@ -66,19 +66,16 @@ public class TurretBehaviour : MonoBehaviour
             {
                 state = TurretState.PlayerInRange;
             }
-            playerSeen = FoundAPlayer();
         }
 
-        if(state == TurretState.PlayerInRange)
+        if (state == TurretState.PlayerInRange)
         {
-            LockLaserOnPlayer();
-
             if (!rotatingToShoot)
             {
                 rotatingToShoot = true;
                 Vector3 pos = PredictNextPlayerPosiion();
                 predictedPos = pos;
-                StartCoroutine(RotateAtPosition(pos));
+                StartCoroutine(RotateAtPositionAndShoot(pos));
             }
 
             if (IsPlayerOutOfRange())
@@ -86,32 +83,6 @@ public class TurretBehaviour : MonoBehaviour
                 state = TurretState.Idle;
             }
         }
-
-
-        //if (playerSeen)
-        //{
-        //    playerSeen = !IsPlayerOutOfRange();
-        //}
-
-        //if (playerSeen)
-        //{
-        //    if (!rotatingToShoot)
-        //    {
-        //        rotatingToShoot = true;
-        //        Vector3 pos = PredictNextPlayerPosiion();
-        //        predictedPos = pos;
-        //        StartCoroutine(RotateAtPosition(pos));
-        //    }
-        //}
-        //else
-        //{
-        //    if (!rotatingToShoot)
-        //    {
-        //        ReturnToRange();
-        //        UpdateRotation();
-        //        playerSeen = FoundAPlayer();
-        //    }
-        //}
     }
 
     private void LockLaserOnPlayer()
@@ -121,16 +92,16 @@ public class TurretBehaviour : MonoBehaviour
 
     private void ReturnToRange()
     {
-        if (rotatingHeadTransform.transform.localEulerAngles.x == xAngle)
+        if (rotatingHeadTransform.transform.localEulerAngles.x == startingXAngle)
         {
             return;
         }
 
-        float currentXAngle = Mathf.Lerp(rotatingHeadTransform.localEulerAngles.x, xAngle, Time.fixedDeltaTime * 5);
+        float currentXAngle = Mathf.Lerp(rotatingHeadTransform.localEulerAngles.x, startingXAngle, Time.fixedDeltaTime * 5);
 
-        if (Mathf.Abs(currentXAngle - xAngle) < 0.5f)
+        if (Mathf.Abs(currentXAngle - startingXAngle) < 0.5f)
         {
-            currentXAngle = xAngle;
+            currentXAngle = startingXAngle;
         }
 
         rotatingHeadTransform.transform.localEulerAngles = new Vector3(currentXAngle, rotatingHeadTransform.transform.localEulerAngles.y, rotatingHeadTransform.transform.localEulerAngles.z);
@@ -139,6 +110,11 @@ public class TurretBehaviour : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (state == TurretState.PlayerInRange || rotatingToShoot)
+        {
+            LockLaserOnPlayer();
+        }
+
         UpdateLineRenderer();
     }
 
@@ -162,6 +138,7 @@ public class TurretBehaviour : MonoBehaviour
         //return FirstOrderIntercept(bulletSpwanPoint.transform.position, Vector3.zero, bullet.GetComponent<BulletBehaviour>().speed, player.transform.position, player.GetComponent<Rigidbody>().velocity);
     }
 
+    #region unused functions
     //first-order intercept using absolute target position
     public Vector3 FirstOrderIntercept(Vector3 shooterPosition, Vector3 shooterVelocity, float shotSpeed, Vector3 targetPosition, Vector3 targetVelocity)
     {
@@ -216,8 +193,9 @@ public class TurretBehaviour : MonoBehaviour
         else //determinant = 0; one intercept path, pretty much never happens
             return Mathf.Max(-b / (2f * a), 0f); //don't shoot back in time
     }
+    #endregion
 
-    IEnumerator RotateAtPosition(Vector3 targetPos)
+    IEnumerator RotateAtPositionAndShoot(Vector3 targetPos)
     {
         GameObject player = GameManager.instance.player;
 
@@ -227,7 +205,6 @@ public class TurretBehaviour : MonoBehaviour
         theta = Mathf.Acos((d2 * d2 + d3 * d3 - d1 * d1) / (2 * d2 * d3));
 
         v2 = bullet.GetComponent<BulletBehaviour>().speed * Time.fixedDeltaTime;
-        //v2 = 0.1f;
 
         float distanceBetweenBulletAndTargetPos = d2 - Vector3.Distance(rotatingHeadTransform.position, bulletSpwanPoint.position);
 
@@ -241,15 +218,35 @@ public class TurretBehaviour : MonoBehaviour
 
         //rotatingHeadTransform.forward = Vector3.Lerp(rotatingHeadTransform.forward, targetVector, w);
 
-        float angleRotated = 0;
-
-        while (angleRotated < theta)
+        if (w > 0.001 && v1 > 0.001f)
         {
-            //rotatingHeadTransform.Rotate(rotatingHeadTransform.transform.up, w);
-            //rotatingHeadTransform.forward = Vector3.MoveTowards(rotatingHeadTransform.forward, targetVector, 0.1f);
-            rotatingHeadTransform.forward = Vector3.Lerp(rotatingHeadTransform.forward, targetVector, w * Time.fixedDeltaTime);
-            angleRotated += w * Time.fixedDeltaTime;
-            yield return new WaitForFixedUpdate();
+            float angleRotated = 0;
+
+            while (angleRotated < theta)
+            {
+                //rotatingHeadTransform.Rotate(rotatingHeadTransform.transform.up, w);
+                //rotatingHeadTransform.forward = Vector3.MoveTowards(rotatingHeadTransform.forward, targetVector, 0.1f);
+                rotatingHeadTransform.forward = Vector3.Lerp(rotatingHeadTransform.forward, targetVector, w * Time.fixedDeltaTime);
+                angleRotated += w * Time.fixedDeltaTime;
+                yield return new WaitForFixedUpdate();
+            }
+        }
+        else
+        {
+            //rotatingHeadTransform.transform.forward = targetVector;
+
+            float timer = 0;
+            while (Mathf.Abs(Vector3.Angle(rotatingHeadTransform.transform.forward, targetVector)) > 3f)
+            {
+                rotatingHeadTransform.transform.forward = Vector3.Lerp(rotatingHeadTransform.transform.forward,targetVector, 2 * Time.fixedDeltaTime);
+                timer += Time.fixedDeltaTime;
+                if(timer > 2f)
+                {
+                    break;
+                }
+                yield return new WaitForFixedUpdate();
+            }
+            rotatingHeadTransform.transform.forward = targetVector;
         }
 
         Invoke("FalsifyRotatingToShoot", 1f);
@@ -273,9 +270,9 @@ public class TurretBehaviour : MonoBehaviour
         if (rotatingRight)
         {
             //rotatingHeadTransform.Rotate(Vector3.up, rotationSpeed * Time.fixedDeltaTime);
-            rotatingHeadTransform.localEulerAngles = new Vector3(rotatingHeadTransform.localEulerAngles.x, rotatingHeadTransform.localEulerAngles.y + rotationSpeed * Time.fixedDeltaTime, rotatingHeadTransform.localEulerAngles.z);
+            rotatingHeadTransform.localEulerAngles = new Vector3(rotatingHeadTransform.localEulerAngles.x, rotatingHeadTransform.localEulerAngles.y + rotationSpeed_Idle * Time.fixedDeltaTime, rotatingHeadTransform.localEulerAngles.z);
 
-            if (ChangeAngleToPositiveAndNegative(rotatingHeadTransform.localEulerAngles.y) > angleOfView)
+            if (ChangeAngleToPositiveAndNegative(rotatingHeadTransform.localEulerAngles.y) > maxYAngle_Idle)
             {
                 //rotatingHeadTransform.localEulerAngles = new Vector3(rotatingHeadTransform.localEulerAngles.x, angleOfView, rotatingHeadTransform.localEulerAngles.z);
                 rotatingRight = false;
@@ -284,9 +281,9 @@ public class TurretBehaviour : MonoBehaviour
         else
         {
             //rotatingHeadTransform.Rotate(Vector3.up, -rotationSpeed * Time.fixedDeltaTime);
-            rotatingHeadTransform.localEulerAngles = new Vector3(rotatingHeadTransform.localEulerAngles.x, rotatingHeadTransform.localEulerAngles.y - rotationSpeed * Time.fixedDeltaTime, rotatingHeadTransform.localEulerAngles.z);
+            rotatingHeadTransform.localEulerAngles = new Vector3(rotatingHeadTransform.localEulerAngles.x, rotatingHeadTransform.localEulerAngles.y - rotationSpeed_Idle * Time.fixedDeltaTime, rotatingHeadTransform.localEulerAngles.z);
 
-            if (ChangeAngleToPositiveAndNegative(rotatingHeadTransform.localEulerAngles.y) < -angleOfView)
+            if (ChangeAngleToPositiveAndNegative(rotatingHeadTransform.localEulerAngles.y) < -maxYAngle_Idle)
             {
                 //rotatingHeadTransform.localEulerAngles = new Vector3(rotatingHeadTransform.localEulerAngles.x, -angleOfView, rotatingHeadTransform.localEulerAngles.z);
                 rotatingRight = true;
@@ -339,7 +336,7 @@ public class TurretBehaviour : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawSphere(predictedPos, 0.5f);
+        Gizmos.DrawWireSphere(predictedPos, 0.5f);
     }
 }
 
@@ -347,5 +344,4 @@ public enum TurretState
 {
     Idle,
     PlayerInRange,
-    RotatingToShoot,
 }

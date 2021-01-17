@@ -692,7 +692,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6368fa9557de6c0459f172b488a61e03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lockCursor: 0
+  lockCursor: 1
   mouseSensitivity: 10
   target: {fileID: 1749308919}
   dstFromTarget: 7
@@ -911,17 +911,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b57d7dc2a612d3429458bf4b450d87c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fileName: File.txt
   mapGenerator: {fileID: 104050126}
   uiManager: {fileID: 1767727630}
   player: {fileID: 1652515576}
-  fileName: File.txt
+  bulletPrefab: {fileID: 7954006542916213209, guid: 624fdbecffcc5054a82ac41802fe3d9c,
+    type: 3}
   mapHeight: 0
   mapWidth: 0
   rows: 
   cols: 
   projectileSpeed: 0
-  bulletPrefab: {fileID: 7954006542916213209, guid: 624fdbecffcc5054a82ac41802fe3d9c,
-    type: 3}
   score: 0
 --- !u!4 &1570340391
 Transform:
@@ -1348,6 +1348,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1652515577, guid: 452be5ed09005054abec90be08c666be, type: 3}
+      propertyPath: impactParticles
+      value: 
+      objectReference: {fileID: 19800004, guid: f95ff734540a0d749be6571b6cb5b37f,
+        type: 3}
     - target: {fileID: 4359974865543550513, guid: 452be5ed09005054abec90be08c666be,
         type: 3}
       propertyPath: cam
@@ -1357,11 +1362,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 4359974865543550524, guid: 452be5ed09005054abec90be08c666be,
-        type: 3}
-      propertyPath: m_CastShadows
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4359974865543550526, guid: 452be5ed09005054abec90be08c666be,
         type: 3}

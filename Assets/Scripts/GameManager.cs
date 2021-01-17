@@ -8,23 +8,26 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    public MapGenerator mapGenerator;
-
-    public UIManager uiManager;
-
-    public GameObject player;
-
     public string fileName;
 
+    public MapGenerator mapGenerator;
+    public UIManager uiManager;
+    
+    //keep reference to the player
+    public GameObject player;
+
+    //To change the bullet speed inside the prefab
+    public GameObject bulletPrefab;
+
+    //Viewing these variables in the inspector to make sure that they have been read correctly
+    [Header("Just to check the values")]
     [SerializeField] int mapHeight;
     [SerializeField] int mapWidth;
     [SerializeField] List<int> rows;
     [SerializeField] List<int> cols;
     [SerializeField] float projectileSpeed;
 
-    public GameObject bulletPrefab;
-
-    public int score;
+    [HideInInspector] public int score;
 
     bool gameEnded = false;
 
@@ -67,9 +70,6 @@ public class GameManager : MonoBehaviour
                     for (int i = 0; i < cells.Length; i++)
                     {
                         cells[i] = cells[i].Trim('(', ')');
-                        //cells[i] = cells[i].Replace(" ", "");
-                        //cells[i] = cells[i].Replace("(", "");
-                        //cells[i] = cells[i].Replace(")", "");
                         string[] cellIndices = cells[i].Split('-');
                         rows.Add(int.Parse(cellIndices[0]));
                         cols.Add(int.Parse(cellIndices[1]));

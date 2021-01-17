@@ -189,20 +189,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 213f8b4731b8f7a48b7ddb44987f97bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  state: 0
-  raycastLayers:
-    serializedVersion: 2
-    m_Bits: 55
-  rotationSpeed: 10
-  angleOfView: 40
+  rotationSpeed_Idle: 30
+  maxYAngle_Idle: 40
   focusRadius: 5
   rotatingHeadTransform: {fileID: 2650004420431031035}
   raycastStartPoint: {fileID: 8664117074058342933}
-  bullet: {fileID: 7954006542916213209, guid: 624fdbecffcc5054a82ac41802fe3d9c, type: 3}
   bulletSpwanPoint: {fileID: 2650004419057974341}
-  playerSeen: 0
-  rotatingToShoot: 0
-  shotDelay: 1
+  bullet: {fileID: 7954006542916213209, guid: 624fdbecffcc5054a82ac41802fe3d9c, type: 3}
+  raycastLayers:
+    serializedVersion: 2
+    m_Bits: 55
 --- !u!120 &2650004419777966219
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -453,8 +449,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5071089119900401536}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.57, y: 0, z: 1.218}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.5700002, y: 0, z: 1.218}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2650004420431031035}

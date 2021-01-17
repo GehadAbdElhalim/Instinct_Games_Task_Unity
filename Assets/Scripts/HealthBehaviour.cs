@@ -7,6 +7,8 @@ public class HealthBehaviour : MonoBehaviour
     public float maxHealth;
     float currentHealth;
 
+    [SerializeField] ParticleSystem impactParticles;
+
     private void Start()
     {
         currentHealth = maxHealth;
@@ -26,6 +28,7 @@ public class HealthBehaviour : MonoBehaviour
             return;
         }
 
+        Instantiate(impactParticles, transform.position, Quaternion.identity);
         currentHealth -= amount;
         GetComponent<MeshRenderer>().material.color = new Color(1, currentHealth / maxHealth, currentHealth / maxHealth);
 
